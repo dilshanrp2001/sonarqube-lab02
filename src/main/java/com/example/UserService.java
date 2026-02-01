@@ -2,26 +2,25 @@ package main.java.com.example;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.Statement;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 public class UserService {
 
-    // SECURITY ISSUE: Hardcoded credentials
-    private String password = "admin123";
+    private String getPassword() {
+        return System.getenv("DB_PASSWORD");
+    }
 
     // VULNERABILITY: SQL Injection
     public void findUser(String username) throws SQLException {
 
         try (Connection conn =
             DriverManager.getConnection("jdbc:mysql://localhost/db",
-                    "root", password);
-             Statement st = conn.createStatement()) {
+                    "root", getPassword());
+             PreparedStatement st = conn.prepareStatement("SELECT * FROM users WHERE name = ?")) {
 
-            String query =
-                "SELECT * FROM users WHERE name = '" + username + "'";
-
-            st.executeQuery(query);
+            st.setString(1, username);
+            st.executeQuery();
         }
     }
 
@@ -33,11 +32,10 @@ public class UserService {
     public void deleteUser(String username) throws SQLException {
         try (Connection conn =
             DriverManager.getConnection("jdbc:mysql://localhost/db",
-                    "root", password);
-             Statement st = conn.createStatement()) {
-            String query =
-                "DELETE FROM users WHERE name = '" + username + "'";
-            st.execute(query);
+                    "root", getPassword());
+             PreparedStatement st = conn.prepareStatement("DELETE FROM users WHERE name = ?")) {
+            st.setString(1, username);
+            st.execute();
         }
     }
 
