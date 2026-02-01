@@ -17,7 +17,7 @@ public class UserService {
         try (Connection conn =
             DriverManager.getConnection("jdbc:mysql://localhost/db",
                     "root", getPassword());
-             PreparedStatement st = conn.prepareStatement("SELECT * FROM users WHERE name = ?")) {
+             PreparedStatement st = conn.prepareStatement("SELECT id, name, email FROM users WHERE name = ?")) {
 
             st.setString(1, username);
             st.executeQuery();
